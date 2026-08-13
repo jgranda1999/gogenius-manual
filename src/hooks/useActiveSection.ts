@@ -1,5 +1,6 @@
 import { useEffect, useState, type RefObject } from 'react';
 import { SECTION_IDS } from '../data/toc';
+import { useLanguage } from '../i18n/LanguageContext';
 
 const OBSERVER_OPTIONS: IntersectionObserverInit = {
   rootMargin: '-10% 0px -75% 0px',
@@ -8,6 +9,7 @@ const OBSERVER_OPTIONS: IntersectionObserverInit = {
 
 export function useActiveSection(contentRef: RefObject<HTMLElement | null>) {
   const [activeId, setActiveId] = useState<string>('welcome');
+  const { language } = useLanguage();
 
   useEffect(() => {
     const root = contentRef.current;
@@ -19,6 +21,8 @@ export function useActiveSection(contentRef: RefObject<HTMLElement | null>) {
 
     if (elements.length === 0) return;
 
+    setActiveId('welcome');
+
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting && entry.target.id) {
@@ -29,7 +33,7 @@ export function useActiveSection(contentRef: RefObject<HTMLElement | null>) {
 
     for (const el of elements) observer.observe(el);
     return () => observer.disconnect();
-  }, [contentRef]);
+  }, [contentRef, language]);
 
   return activeId;
 }
