@@ -37,7 +37,8 @@
   .content-inner{max-width:var(--content-max);}
 
   /* Sidebar / brand */
-  .brand{display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem;}
+  .brand{display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem;color:inherit;text-decoration:none;cursor:pointer;}
+  .brand:hover{text-decoration:none;color:inherit;}
   .brand-mark{
     width:38px;height:38px;border-radius:11px;flex:0 0 38px;display:block;object-fit:cover;
   }

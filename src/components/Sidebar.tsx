@@ -8,12 +8,26 @@ type SidebarProps = {
 export function Sidebar({ activeId, onNavigate }: SidebarProps) {
   const { ui } = useLanguage();
 
+  const scrollToTop = () => {
+    onNavigate();
+    document.getElementById('welcome')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <aside className="sidebar" id="sidebar">
-      <div className="brand">
+      <a
+        className="brand"
+        href="#welcome"
+        onClick={(event) => {
+          event.preventDefault();
+          scrollToTop();
+          window.history.replaceState(null, '', '#welcome');
+        }}
+        aria-label="GoGenius"
+      >
         <img className="brand-mark" src="/gogenius-logo.png" alt="" width={38} height={38} />
         <div className="brand-name">GoGenius</div>
-      </div>
+      </a>
       <div className="brand-sub">{ui.userManual}</div>
       <nav className="toc" id="toc" aria-label={ui.tocAriaLabel}>
         {ui.toc.map(({ id, num, label }) => (
