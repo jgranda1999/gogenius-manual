@@ -1,39 +1,82 @@
-import { useEffect, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { SECTION_IDS } from '../data/toc';
 import { useLanguage } from '../i18n/LanguageContext';
 
-const OBSERVER_OPTIONS: IntersectionObserverInit = {
-  rootMargin: '-10% 0px -75% 0px',
-  threshold: 0,
-};
+function sectionOffset(): number {
+  return window.matchMedia('(max-width: 860px)').matches ? 96 : 88;
+}
 
-export function useActiveSection(contentRef: RefObject<HTMLElement | null>) {
+function sectionFromScroll(): string {
+  const offset = sectionOffset();
+  let current = SECTION_IDS[0];
+
+  for (const id of SECTION_IDS) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    if (el.getBoundingClientRect().top <= offset) current = id;
+  }
+
+  return current;
+}
+
+export function useActiveSection() {
   const [activeId, setActiveId] = useState<string>('welcome');
   const { language } = useLanguage();
+  const lockRef = useRef<string | null>(null);
+  const unlockTimer = useRef(0);
+
+  const apply = useCallback((id: string) => {
+    setActiveId((prev) => (prev === id ? prev : id));
+  }, []);
+
+  const activateSection = useCallback(
+    (id: string) => {
+      lockRef.current = id;
+      apply(id);
+      window.clearTimeout(unlockTimer.current);
+      unlockTimer.current = window.setTimeout(() => {
+        lockRef.current = null;
+        apply(sectionFromScroll());
+      }, 800);
+    },
+    [apply],
+  );
 
   useEffect(() => {
-    const root = contentRef.current;
-    if (!root) return;
+    let frame = 0;
 
-    const elements = SECTION_IDS.map((id) => root.querySelector<HTMLElement>(`#${CSS.escape(id)}`)).filter(
-      (el): el is HTMLElement => el != null,
-    );
+    const update = () => {
+      if (lockRef.current) return;
+      apply(sectionFromScroll());
+    };
 
-    if (elements.length === 0) return;
+    const onScrollOrResize = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    };
 
-    setActiveId('welcome');
+    const onHashChange = () => {
+      const id = window.location.hash.replace(/^#/, '');
+      if (SECTION_IDS.includes(id)) activateSection(id);
+      else update();
+    };
 
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting && entry.target.id) {
-          setActiveId(entry.target.id);
-        }
-      }
-    }, OBSERVER_OPTIONS);
+    const hash = window.location.hash.replace(/^#/, '');
+    if (SECTION_IDS.includes(hash)) apply(hash);
+    else update();
 
-    for (const el of elements) observer.observe(el);
-    return () => observer.disconnect();
-  }, [contentRef, language]);
+    window.addEventListener('scroll', onScrollOrResize, { passive: true });
+    window.addEventListener('resize', onScrollOrResize);
+    window.addEventListener('hashchange', onHashChange);
 
-  return activeId;
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(unlockTimer.current);
+      window.removeEventListener('scroll', onScrollOrResize);
+      window.removeEventListener('resize', onScrollOrResize);
+      window.removeEventListener('hashchange', onHashChange);
+    };
+  }, [language, apply, activateSection]);
+
+  return { activeId, activateSection };
 }

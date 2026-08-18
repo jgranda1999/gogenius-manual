@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { LanguageSelector } from './components/LanguageSelector';
 import { ManualContent } from './components/ManualContent';
 import { Sidebar } from './components/Sidebar';
@@ -9,8 +9,7 @@ import './styles/manual.css';
 
 export default function App() {
   const [navOpen, setNavOpen] = useState(false);
-  const contentRef = useRef<HTMLElement>(null);
-  const activeId = useActiveSection(contentRef);
+  const { activeId, activateSection } = useActiveSection();
   const { closeNav } = useMobileNav(navOpen, setNavOpen);
   const { ui } = useLanguage();
 
@@ -27,8 +26,13 @@ export default function App() {
         {ui.contents}
       </button>
       <div className="shell">
-        <Sidebar activeId={activeId} onNavigate={closeNav} />
-        <main className="content" ref={contentRef}>
+        <Sidebar
+          activeId={activeId}
+          navOpen={navOpen}
+          onNavigate={closeNav}
+          onActivate={activateSection}
+        />
+        <main className="content">
           <LanguageSelector />
           <ManualContent />
         </main>
