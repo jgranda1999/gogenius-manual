@@ -221,6 +221,8 @@
     .quickstart{padding:1.25rem 1.2rem 1.3rem;}
     .hero{padding-top:.4rem;}
     .lede{font-size:1.05rem;}
+    .factbar{grid-template-columns:1fr 1fr;}
+    .factbar .fact:last-child{grid-column:1/-1;}
   }
   @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}}
   /* Quick-start onboarding card */
