@@ -10,12 +10,9 @@ import {
 import {
   DEFAULT_LANGUAGE,
   getLanguage,
-  isLanguageCode,
   type LanguageCode,
 } from './languages';
 import { UI, type UiStrings } from './ui';
-
-const STORAGE_KEY = 'gogenius-manual-lang';
 
 type LanguageContextValue = {
   language: LanguageCode;
@@ -26,26 +23,11 @@ type LanguageContextValue = {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-function readStoredLanguage(): LanguageCode {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && isLanguageCode(stored)) return stored;
-  } catch {
-    /* ignore */
-  }
-  return DEFAULT_LANGUAGE;
-}
-
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<LanguageCode>(readStoredLanguage);
+  const [language, setLanguageState] = useState<LanguageCode>(DEFAULT_LANGUAGE);
 
   const setLanguage = useCallback((code: LanguageCode) => {
     setLanguageState(code);
-    try {
-      localStorage.setItem(STORAGE_KEY, code);
-    } catch {
-      /* ignore */
-    }
   }, []);
 
   const meta = getLanguage(language);
