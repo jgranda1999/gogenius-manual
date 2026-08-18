@@ -25,7 +25,13 @@ export function Sidebar({ activeId, onNavigate }: SidebarProps) {
         }}
         aria-label="GoGenius"
       >
-        <img className="brand-mark" src="/gogenius-logo.png" alt="" width={38} height={38} />
+        <img
+          className="brand-mark"
+          src={`${import.meta.env.BASE_URL}gogenius-logo.png`}
+          alt=""
+          width={38}
+          height={38}
+        />
         <div className="brand-name">GoGenius</div>
       </a>
       <div className="brand-sub">{ui.userManual}</div>

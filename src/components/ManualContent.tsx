@@ -22,9 +22,14 @@ const MANUAL_BY_LANGUAGE: Record<LanguageCode, string> = {
   de,
 };
 
+function withBaseUrl(html: string): string {
+  const base = import.meta.env.BASE_URL;
+  return html.replace(/(src|href)="\/([^"]+)"/g, `$1="${base}$2"`);
+}
+
 export function ManualContent() {
   const { language } = useLanguage();
-  const html = MANUAL_BY_LANGUAGE[language];
+  const html = withBaseUrl(MANUAL_BY_LANGUAGE[language]);
 
   return (
     <div
