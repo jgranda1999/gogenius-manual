@@ -19,8 +19,16 @@ export function useMobileNav(navOpen: boolean, setNavOpen: (open: boolean) => vo
       setNavOpen(false);
     };
 
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setNavOpen(false);
+    };
+
     document.addEventListener('click', onDocClick);
-    return () => document.removeEventListener('click', onDocClick);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('click', onDocClick);
+      document.removeEventListener('keydown', onKeyDown);
+    };
   }, [navOpen, setNavOpen]);
 
   return { closeNav };

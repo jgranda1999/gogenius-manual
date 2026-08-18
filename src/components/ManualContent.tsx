@@ -24,7 +24,10 @@ const MANUAL_BY_LANGUAGE: Record<LanguageCode, string> = {
 
 function withBaseUrl(html: string): string {
   const base = import.meta.env.BASE_URL;
-  return html.replace(/(src|href)="\/([^"]+)"/g, `$1="${base}$2"`);
+  return html
+    .replace(/(src|href)="\/([^"]+)"/g, `$1="${base}$2"`)
+    .replace(/<table class="tbl">/g, '<div class="tbl-scroll"><table class="tbl">')
+    .replace(/<\/table>/g, '</table></div>');
 }
 
 export function ManualContent() {
